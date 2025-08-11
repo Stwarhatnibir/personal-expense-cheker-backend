@@ -6,15 +6,20 @@ const cors = require("cors");
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Allow only your Netlify frontend
+app.use(
+  cors({
+    origin: "https://your-netlify-site.netlify.app", // replace with your actual Netlify URL
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 app.use(bodyParser.json());
 
 // Connect to MongoDB Atlas
 mongoose
-  .connect(process.env.MONGO_URI, {
-    // useNewUrlParser & useUnifiedTopology are no longer required in latest driver
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
@@ -55,13 +60,7 @@ app.post("/api/expenses", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const expense = new Expense({
-      amount,
-      category,
-      date,
-      description,
-    });
-
+    const expense = new Expense({ amount, category, date, description });
     await expense.save();
     res.status(201).json(expense);
   } catch (error) {
