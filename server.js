@@ -6,31 +6,14 @@ const cors = require("cors");
 
 const app = express();
 
-// Allowed origins for CORS
-const allowedOrigins = [
-  "http://localhost:5173", // local dev frontend port
-  "http://localhost:3000", // alternate local frontend port
-  "https://incredible-baklava-788502.netlify.app", // your Netlify frontend URL
-];
-
-// CORS middleware
+// Allow only your Netlify frontend
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (e.g., mobile apps, curl)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "OPTIONS"],
+    origin: "incredible-baklava-788502.netlify.app", // replace with your actual Netlify URL
+    methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
 );
-
-// Handle preflight requests for all routes
-app.options("*", cors());
 
 app.use(bodyParser.json());
 
@@ -40,7 +23,7 @@ mongoose
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Expense schema and model
+// Expense Model
 const expenseSchema = new mongoose.Schema(
   {
     amount: { type: Number, required: true },
@@ -53,7 +36,7 @@ const expenseSchema = new mongoose.Schema(
 
 const Expense = mongoose.model("Expense", expenseSchema);
 
-// API routes (note: only relative paths, no full URLs!)
+// API Routes
 app.get("/api/expenses", async (req, res) => {
   try {
     const { category, date } = req.query;
