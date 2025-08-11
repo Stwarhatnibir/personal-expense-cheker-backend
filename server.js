@@ -6,10 +6,21 @@ const cors = require("cors");
 
 const app = express();
 
-// Allow only your Netlify frontend
+// ✅ Allow both local development and your deployed Netlify site
+const allowedOrigins = [
+  "http://localhost:5173", // or 3000 depending on your local frontend
+  "https://incredible-baklava-788502.netlify.app",
+];
+
 app.use(
   cors({
-    origin: "https://your-netlify-site.netlify.app", // replace with your actual Netlify URL
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
