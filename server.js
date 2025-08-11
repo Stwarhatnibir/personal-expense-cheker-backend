@@ -9,7 +9,7 @@ const app = express();
 // Allow only your Netlify frontend
 app.use(
   cors({
-    origin: "incredible-baklava-788502.netlify.app", // replace with your actual Netlify URL
+    origin: "https://incredible-baklava-788502.netlify.app",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
