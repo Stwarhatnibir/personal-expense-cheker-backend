@@ -6,18 +6,18 @@ const cors = require("cors");
 
 const app = express();
 
-// ✅ Allow both local dev & Netlify frontend
+// Allowed origins for CORS
 const allowedOrigins = [
-  "http://localhost:5173", // local dev
-  "http://localhost:3000", // alternate local dev
-  "https://incredible-baklava-788502.netlify.app", // deployed frontend
+  "http://localhost:5173", // local dev frontend port
+  "http://localhost:3000", // alternate local frontend port
+  "https://incredible-baklava-788502.netlify.app", // your Netlify frontend URL
 ];
 
-// ✅ CORS config
+// CORS middleware
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (e.g. mobile apps, curl)
+      // allow requests with no origin (e.g., mobile apps, curl)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -26,23 +26,21 @@ app.use(
     },
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
-    credentials: true, // optional, if you ever use cookies/auth
   })
 );
 
-// ✅ Handle preflight requests for all routes
+// Handle preflight requests for all routes
 app.options("*", cors());
 
-// Middleware
 app.use(bodyParser.json());
 
-// ✅ MongoDB Connection
+// Connect to MongoDB Atlas
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Expense Schema & Model
+// Expense schema and model
 const expenseSchema = new mongoose.Schema(
   {
     amount: { type: Number, required: true },
@@ -55,7 +53,7 @@ const expenseSchema = new mongoose.Schema(
 
 const Expense = mongoose.model("Expense", expenseSchema);
 
-// ✅ Routes
+// API routes (note: only relative paths, no full URLs!)
 app.get("/api/expenses", async (req, res) => {
   try {
     const { category, date } = req.query;
@@ -87,7 +85,7 @@ app.post("/api/expenses", async (req, res) => {
   }
 });
 
-// ✅ Start Server
+// Start server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
